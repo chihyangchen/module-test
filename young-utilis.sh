@@ -1,5 +1,31 @@
 #!/bin/sh  
 
+
+stopmachine()
+{
+	sync;
+	sleep 1
+	halt
+}
+ssdmount()
+{
+	mount /dev/sda1 /home/work/young/ssd-mount/
+	if [ $? ]
+	then
+		echo "mount to /home/work/young/ssd-mount success"
+	else
+		echo "mount fail, please check"
+	fi
+}
+ssdumount()
+{
+	umount /home/work/young/ssd-mount
+	if [ $? ]
+	then 
+		echo "umount success"
+	fi
+}
+
 moxaip()
 {
 	:>/etc/resolv.conf
@@ -24,7 +50,7 @@ connect()
 {
 	delip
 	cd /home/work/
-	./connect-5g-by-qmi.sh
+	./connect-5g-qmi.sh
 }
 linkdown()
 {
