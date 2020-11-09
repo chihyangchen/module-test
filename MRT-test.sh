@@ -1,41 +1,46 @@
 #!/bin/bash
 
+
+exp_init()
+{
 # AT port
-device='/dev/ttyUSB2'
+	device='/dev/ttyUSB2'
 # time duration to check
-t_check=0
-t_up=10
-cat "$device" > log &
-sleep 0.5
-
-
-echo 'ATE0' >> "$device"
-echo 'AT' >> "$device"
-
-
-test1(){
-for i in {1..5}
-do
-	echo 'at+qeng="servingcell"' >> "$device"
-	sleep 0.5
-	echo 'at+QLTS=2' >> "$device"
+	t_check=0
+	t_up=10
+	cat "$device" > log &
 	sleep 0.5
 
-	if [ $t_check == $t_up ]
-	then
-		t_check=0
-		echo "$t_check"
-		echo "reset"
-	else
-		t_check=$((t_check+1))
-		echo "$t_check"
-		echo "counting"
-	fi
+	echo 'ATE0' >> "$device"
+	echo 'AT' >> "$device"
+	sleep 0.5
+}
 
-done
+test1()
+{
+	exp_init
+	for i in {1..5}
+	do
+		echo 'at+qeng="servingcell"' >> "$device"
+		sleep 0.5
+		echo 'at+QLTS=2' >> "$device"
+		sleep 0.5
 
-killall cat
-cat log
+		if [ $t_check == $t_up ]
+		then
+			t_check=0
+			echo "$t_check"
+			echo "reset"
+		else
+			t_check=$((t_check+1))
+			echo "$t_check"
+			echo "counting"
+		fi
+
+	done
+
+	killall cat
+	cat log
 }
 
 ramdisk()
@@ -70,7 +75,10 @@ check()
 #	echo "$curdir"
 	if [ $numoffile -gt 1 ]
 	then
-		mv /tmp/ramdisk/"$filename" "$curdir"/"$filename"
+		temp=`ls /tmp/ramdisk -lht --time-style=full-iso | tail -1`
+#		mv /tmp/ramdisk/"$filename" "$curdir"/"$filename"
+		mv /tmp/ramdisk/"$filename" /home/work/young/ssd-mount/"$filename"
+		echo "$temp" >> file-time-log
 		echo "$filename moving done"
 	else
 		echo "No target file to be moved"
@@ -79,7 +87,9 @@ check()
 
 exp()
 {
-	for i in {1..100}
+	exp_init
+#	for i in {1..100}
+	while true
 	do
 		echo 'at+qeng="servingcell"' >> "$device"
 		sleep 0.5
